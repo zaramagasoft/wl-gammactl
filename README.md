@@ -1,38 +1,43 @@
-# wl-gammactl
-![wl-gammactl](img/wl-gammactl.png)
+# Motor Gamma 🔆
 
+Un servicio ligero (daemon) escrito en C puro para controlar dinámicamente el brillo, contraste y gamma en compositores Wayland compatibles (basados en wlroots). 
 
-Small GTK GUI application to set contrast, brightness and gamma for wayland compositors which support the wlr-gamma-control protocol extension.
-Basically this is the example from here: https://github.com/swaywm/wlroots/blob/master/examples/gamma-control.c
-with a nice little GTK GUI slapped on to it. You can set contrast, brightness and gamma using sliders and reset back to default values.
+Utiliza comunicación IPC mediante un *Named Pipe* (FIFO), lo que permite aplicar cambios instantáneos a la pantalla sin necesidad de reiniciar el proceso o usar herramientas pesadas como D-Bus. Es ideal para integrarlo como "motor" (backend) en barras de estado, docks o gestores de atajos de teclado.
 
+---
 
-This was made to make the process of calibrating your monitor a bit easier, since wayland support for color profiles is not yet implemented.
-When you are satisfied with your settings, copy the given command line and execute it at startup to make the settings load at apply on every boot.
+## 🚀 Compilación
 
+Asegúrate de tener instaladas las cabeceras de Wayland (`wayland-client`) y compila el proyecto con GCC:
 
-Keep in mind that it uses the same protocol extension like the redshift fork https://aur.archlinux.org/packages/redshift-wlr-gamma-control/  
-When running wl-gammactl it will kick out any running redshift instance and fail to start up. On second run it should work as expected.
-So unfortunatly only one can run at a time (?) for now.
+```bash
 
-# Build
-For most use cases this should do:  
-Clone the repository and
-```console
-$ meson build
-$ ninja -C build
-```
+cd src
 
-# Run
-Call without any arguments to run the GUI
-```console
-$ wl-gammactl
-```
+gcc main2.c wlr-gamma-control-unstable-v1-client-protocol.c -o motor_gamma -lwayland-client -lm
 
-Call with arguments to set values without GUI, eg:
-```console
-$ wl-gammactl -c 0.996 -b 1 -g 1.05
-```
-Useful for calling on startup
+compilar
+gcc main2.c wlr-gamma-control-unstable-v1-client-protocol.c -o motor_gamma -lwayland-client -lm
 
+ejecutar terminal 1
+./motor_gamma
+Servicio Gamma iniciado. Escuchando en /tmp/gamma_pipe
 
+otra shell
+echo "b 1.3" > /tmp/gamma_pipe
+
+1. Desde la Terminal (Para probar)
+   Puedes enviar las letras b (brillo), c (contraste) o g (gamma) seguidas del valor que quieras:
+
+Brillo (b): Controla la luminosidad general (0.0 a 1.0 es lo normal, más de 1.0 satura).
+
+Bash
+echo "b 0.8" > /tmp/gamma_pipe
+Contraste (c): Controla la diferencia entre claros y oscuros (1.0 es normal, 1.5 es alto, 0.5 es lavado).
+
+Bash
+echo "c 1.2" > /tmp/gamma_pipe
+Gamma (g): Controla la curva de tonos medios (1.0 es normal, 0.8 oscurece los grises, 1.2 los aclara).
+
+Bash
+echo "g 0.9" > /tmp/gamma_pipe

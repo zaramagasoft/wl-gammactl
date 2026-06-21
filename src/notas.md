@@ -1,3 +1,18 @@
+# Motor Gamma 🔆
+
+Un servicio ligero (daemon) escrito en C puro para controlar dinámicamente el brillo, contraste y gamma en compositores Wayland compatibles (basados en wlroots). 
+
+Utiliza comunicación IPC mediante un *Named Pipe* (FIFO), lo que permite aplicar cambios instantáneos a la pantalla sin necesidad de reiniciar el proceso o usar herramientas pesadas como D-Bus. Es ideal para integrarlo como "motor" (backend) en barras de estado, docks o gestores de atajos de teclado.
+
+---
+
+## 🚀 Compilación
+
+Asegúrate de tener instaladas las cabeceras de Wayland (`wayland-client`) y compila el proyecto con GCC:
+
+```bash
+gcc main2.c wlr-gamma-control-unstable-v1-client-protocol.c -o motor_gamma -lwayland-client -lm
+
 compilar
 gcc main2.c wlr-gamma-control-unstable-v1-client-protocol.c -o motor_gamma -lwayland-client -lm
 

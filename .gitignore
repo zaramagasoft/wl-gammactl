@@ -1,7 +1,34 @@
+# ==========================================
+# Ejecutables y archivos compilados de C
+# ==========================================
+motor_gamma
+src/motor_gamma
+*.o
+*.a
+*.so
+
+# ==========================================
+# Directorios de compilación (Meson/CMake)
+# ==========================================
 build/
-.vscode/
-glade/window_main.glade~
-wlr-protocools/
+buildDir/
+
+# ==========================================
+# Archivos autogenerados (Wayland y GTK)
+# ==========================================
+wlr-protocols/
 src/wlr-gamma-control-unstable-v1-client-protocol.c
 src/wlr-gamma-control-unstable-v1-client-protocol.h
 src/resources.c
+
+# ==========================================
+# Configuraciones de IDEs y Editores
+# ==========================================
+.idea/
+.vscode/
+
+# ==========================================
+# Archivos temporales y backups
+# ==========================================
+*~
+*.swp
