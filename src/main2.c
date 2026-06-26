@@ -258,6 +258,60 @@ int main(int argc, char *argv[]) {
 		if (fds[1].revents & POLLIN) {
 			char buf[64];
 			ssize_t n = read(fifo_fd, buf, sizeof(buf) - 1);
+			printf("DEBUG: Leído %zd bytes del FIFO\n", n);
+			if (buf[0] == 'q') {
+				FILE *f = fopen("/tmp/gamma_state.txt", "w");
+				if (f) {
+					fprintf(f,
+							"v %f %f %f",
+							(float)brightness,
+							(float)contrast,
+							(float)gamma);
+					fclose(f);
+				}
+			}
+			if (n > 0) {
+				buf[n] = '\0';
+
+				// 1. Limpieza: quitamos posibles espacios o saltos de línea al inicio
+				char *ptr = buf;
+				while (*ptr == ' ' || *ptr == '\n' || *ptr == '\r') ptr++;
+				printf("DEBUG: Recibido del FIFO: '%s'\n", ptr);
+				if (ptr[0] == 'q') {
+					char reply[64];
+					// Aquí usamos las variables globales que se actualizan con sscanf
+					snprintf(reply,
+							sizeof(reply),
+							"v %f %f %f",
+							(float)brightness,
+							(float)contrast,
+							(float)gamma);
+					printf("DEBUG: Respondiendo con: %s\n", reply);
+					write(fifo_fd, reply, strlen(reply));
+				} else {
+					char cmd;
+					double val;
+					if (sscanf(ptr, "%c %lf", &cmd, &val) == 2) {
+						// AQUÍ actualizas las variables que luego leerá el 'q'
+						if (cmd == 'b')
+							brightness = val;
+						else if (cmd == 'c')
+							contrast = val;
+						else if (cmd == 'g')
+							gamma = val;
+
+						wl_set_cbg(contrast, brightness, gamma);
+						printf("DEBUG: Ajustado a b:%.1f c:%.1f g:%.1f\n",
+								brightness,
+								contrast,
+								gamma);
+					}
+				}
+			}
+		}
+		/* if (fds[1].revents & POLLIN) {
+			char buf[64];
+			ssize_t n = read(fifo_fd, buf, sizeof(buf) - 1);
 			if (n > 0) {
 				buf[n] = '\0';
 
@@ -293,7 +347,7 @@ int main(int argc, char *argv[]) {
 					}
 				}
 			}
-		}
+		} */
 		/* // Eventos del FIFO (tu dock ha enviado un nuevo valor)
 		if (fds[1].revents & POLLIN) {
 			char buf[64];
